@@ -19,6 +19,10 @@ jobs:
           name: Make sure build folder exists
           command: |
             ls -lah build/
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/build
 
   # test
 
