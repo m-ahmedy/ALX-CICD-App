@@ -1,0 +1,42 @@
+Description: >
+  CI/CD infrastructure stack
+
+Parameters:
+  BucketName:
+    Description: Unique identifier
+    Type: String
+
+Resources:
+  WebsiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "cicd-app-${BucketName}"
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+  
+  WebsiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref 'WebsiteBucket'
+      PolicyDocument:
+        Statement:
+        - Sid: PublicReadForGetBucketObjects
+          Effect: Allow
+          Principal: '*'
+          Action: s3:GetObject
+          Resource: !Join ['', ['arn:aws:s3:::', !Ref 'WebsiteBucket', /*]]
+
+Outputs:
+  BucketName:
+    Value: !Ref WebsiteBucket
+    Description: Name of the S3 bucket
+    Export:
+      Name: ALX-CICD-App-Bucket-Name
+
+  WebsiteURL:
+    Value: !GetAtt WebsiteBucket.WebsiteURL
+    Description: URL for website hosted on S3
+    Export:
+      Name: ALX-CICD-App-URL
