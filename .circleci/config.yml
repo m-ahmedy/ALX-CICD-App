@@ -1,4 +1,3 @@
-
 version: 2.1
 
 jobs:
@@ -62,6 +61,37 @@ jobs:
           command: |
             npm run scan
 
+  deploy:
+    docker:
+      - image: cimg/aws:2022.11
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Make sure build folder exists
+          command: |
+            ls -lah ~/project/build/
+      - run:
+          name: Sync the build folder to the S3 bucket
+          command: |
+            aws s3 sync ~/project/build s3://${S3_BUCKET_NAME} --delete
+
+  verify:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - run:
+          name: Verify website works
+          command: |
+            if curl -s $S3_WEBSITE_ENDPOINT | grep "App"
+            then
+              echo "Website Works"
+              exit 0
+            else
+              echo "Website does not work"
+              exit 1
+            fi
+
 workflows:
   default:
     jobs:
@@ -72,3 +102,10 @@ workflows:
       - scan:
           requires:
             - build
+      - deploy:
+          requires:
+            - scan
+            - test
+      - verify:
+          requires:
+            - deploy
