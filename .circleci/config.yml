@@ -7,10 +7,16 @@ jobs:
       - image: cimg/node:lts
     steps:
       - checkout
+      - restore_cache:
+          key: v1-npm-deps-{{ checksum "package-lock.json" }}
       - run:
           name: Install Node.js Dependencies
           command: |
             npm install
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-npm-deps-{{ checksum "package-lock.json" }}
       - run:
           name: Generate production build
           command: |
@@ -29,6 +35,8 @@ jobs:
       - image: cimg/node:lts
     steps:
       - checkout
+      - restore_cache:
+          key: v1-npm-deps-{{ checksum "package-lock.json" }}
       - run:
           name: Install Node.js Dependencies
           command: |
@@ -43,6 +51,8 @@ jobs:
       - image: cimg/node:lts
     steps:
       - checkout
+      - restore_cache:
+          key: v1-npm-deps-{{ checksum "package-lock.json" }}
       - run:
           name: Install Node.js Dependencies
           command: |
