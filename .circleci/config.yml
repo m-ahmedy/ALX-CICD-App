@@ -24,17 +24,41 @@ jobs:
           paths:
             - project/build
 
-  # test
+  test:
+    docker:
+      - image: cimg/node:lts
+    steps:
+      - checkout
+      - run:
+          name: Install Node.js Dependencies
+          command: |
+            npm install
+      - run:
+          name: Run unit test suites
+          command: |
+            npm run test
 
-  # scan
+  scan:
+    docker:
+      - image: cimg/node:lts
+    steps:
+      - checkout
+      - run:
+          name: Install Node.js Dependencies
+          command: |
+            npm install
+      - run:
+          name: Scan source code for critical vulnerabilities
+          command: |
+            npm run scan
 
 workflows:
   default:
     jobs:
       - build
-      # - test:
-      #     requires:
-      #       - build
-      # - scan:
-      #     requires:
-      #       - build
+      - test:
+          requires:
+            - build
+      - scan:
+          requires:
+            - build
