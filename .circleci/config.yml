@@ -1,0 +1,36 @@
+
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: cimg/node:lts
+    steps:
+      - checkout
+      - run:
+          name: Install Node.js Dependencies
+          command: |
+            npm install
+      - run:
+          name: Generate production build
+          command: |
+            npm run build
+      - run:
+          name: Make sure build folder exists
+          command: |
+            ls -lah build/
+
+  # test
+
+  # scan
+
+workflows:
+  default:
+    jobs:
+      - build
+      # - test:
+      #     requires:
+      #       - build
+      # - scan:
+      #     requires:
+      #       - build
